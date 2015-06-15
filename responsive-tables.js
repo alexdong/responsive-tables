@@ -15,28 +15,34 @@ $(document).ready(function() {
       });
     }
   };
-   
+
   $(window).load(updateTables);
   $(window).on("redraw",function(){switched=false;updateTables();}); // An event to listen for
   $(window).on("resize", updateTables);
-   
-	
+
+
 	function splitTable(original)
 	{
+    var cols = original.data('columns'),
+        selector = ':first-child';
+    if (typeof cols !== 'undefined') selector = ':lt(' + cols + ')';
+
 		original.wrap("<div class='table-wrapper' />");
-		
 		var copy = original.clone();
-		copy.find("td:not(:first-child), th:not(:first-child)").css("display", "none");
 		copy.removeClass("responsive");
-		
+
 		original.closest(".table-wrapper").append(copy);
 		copy.wrap("<div class='pinned' />");
 		original.wrap("<div class='scrollable' />");
 
+		copy.find('tr').find("td:not(" + selector + "), th:not(" + selector + ")").addClass('hide');
+    original.find('tr').find('td' + selector + ', th' + selector).addClass('hide');
+
     setCellHeights(original, copy);
 	}
-	
+
 	function unsplitTable(original) {
+    original.closest(".table-wrapper").find(".hide").removeClass('hide');
     original.closest(".table-wrapper").find(".pinned").remove();
     original.unwrap();
     original.unwrap();
